@@ -55,6 +55,7 @@ def one_page_snippet(page, search):
     return snippet
 
 
+
 def f_snippet(search):
     req = []  # список слов
     data = search.split()
@@ -113,6 +114,7 @@ def form():
         search = round(average_salary(request.form['search']), 2)
         snippet = f_snippet(request.form['search'])
         return render_template("search.html", salary=search, search=request.form['search'], snippet=snippet)
+
 
 
 @app.route("/contacts")
