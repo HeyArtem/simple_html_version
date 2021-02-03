@@ -3,6 +3,14 @@ from flask import request
 import requests
 from flask import render_template
 
+""" 
+Программа берет профессию и город 
+и выдает среднюю зарплату и основные требуемые навыки 
+в процентном соотношении. 
+
+Запуск: python main.py
+"""
+
 app = Flask(__name__)
 
 url = 'https://api.hh.ru/vacancies'
