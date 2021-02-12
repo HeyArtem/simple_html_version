@@ -16,42 +16,88 @@ app = Flask(__name__)
 url = 'https://api.hh.ru/vacancies'
 
 def f_vacancies(page, search):
-    '''Зарплата на одной странице'''
+    '''Средняя Зарплата на одной странице'''
     salary = []
+    ''' Переменной salary присвоен словарь , пока пустой'''
     params = {'text': f'{search}', 'page': page}
-    '''' Это параметры запроса в search впишется наше слово поиска'''
+    '''' Это параметры запроса в search впишется наше слово поиска и номер страницы из найденого?!?!'''
     vacancies = requests.get(url, params=params).json()
     ''''Это запрос по указанному адресу и нашими поисковыми слова, результат запроса присваиваем переменной vacancies '''
+    print(type(vacancies),vacancies )
     for item in vacancies['items']:
+        ''' т.к. значение vacancies это словарь -> vacancies:Вакансии<-   и Вакансии есть тоже словарь
+           id:номер, name:должнсть, 'area':{'id':'104','name':'Челябинск', 'url':'https://api.hh.ru/areas/104'},
+           'salary':{'from':45000, 'to':None, 'currency':'RUR', 'gross':False} и т.д.
+           мы будем обращаться по ключу 
+         '''
         start, stop = 0, 0
+        '''' присвоили переменным значения 0 '''
         if item['salary'] and item['salary']['currency'] == 'RUR':
+            ''' если в словаре есть ключ item со значением salari и есть ключ salary со значением 'currency':'RUR', 
+               то мы продолжаем выполнять цикл
+            '''
             if item['salary']['from'] and item['salary']['to']:
                 start = int(item['salary']['from'])
                 stop = int(item['salary']['to'])
+                '''
+                Если разделе from и в разделе to есть значения, присваиваем их переменным start & stop 
+                и делаем их целыми числами
+                '''
             elif item['salary']['from'] and not item['salary']['to']:
                 start = int(item['salary']['from'])
                 stop = start
             elif not item['salary']['from'] and item['salary']['to']:
                 stop = int(item['salary']['to'])
                 start = stop
+                ''' 
+                Если есть данные from, но нет данных в разделе to, значение stop будет равно значению start
+                если нет значения from, но есть to, то start=stop (from=to).И все значения форматируем в целое число (int)
+                '''
         if (start + stop) / 2 > 0:
             salary.append((start + stop) / 2)
     return salary
-
+''''
+Если сумма from&to деленное на 2 >0, то в сисок salary записываем среднее значение от очередной вакансии
+'''
 
 def average_salary(search):
     '''Средняя зарпалата'''
     data = search.split()
     search = ' AND '.join(data)
+    ''''
+     Введеный при старте наш текстовый запрос, мы разделил по пробелу
+     и вставили and м/у словами и применили метод join!?!?!?!?  и это все присвоили переменной search
+     '''
     params = {'text': f'{search}'}
     pages = requests.get(url, params=params).json()['pages']
+    '''
+    В переменную pages сохраняем данные запроса, хотим результат в формате json
+    и почему то хотим найти словарь со значением['pages'] и хотим его ключ?!?!?!?
+    '''
     vacancies = []
+    '''
+    Опять создали словарь и присвоили ему имя vacancies = []. 
+    Получается, что данный словаря изи класса "def f_vacancies(page, search):"
+    потому что они внутри классовые, не глобальные?!?!?!?
+    '''
     for page in range(pages):
         vacancies.extend(f_vacancies(page, search))
+        '''
+        Цикл: Для каждой страницы в диапазоне pages(это общее число страниц в ответе от запроса)
+        созданный словарь vacancies расширяем, добавляем по одной странце, активируя класс (f_vacancies(page, search))
+         который выдает по одной странице '''
     if len(vacancies):
         return sum(vacancies) / len(vacancies)
+    '''
+    Если длина списка vacancies есть какое то значение, то вернуть 
+    частное от суммы данных из переменной (vacancies) (я не пойму суммы вакансий или страниц??
+    и длины данных из переменной (vacancies) есть какое то число, то вернуть ?!?!?!
+    '''
     else:
         return 'Нет данных!'
+'''
+В противном случае вывести 'Нет данных!
+''''
 
 
 def one_page_snippet(page, search):
@@ -62,6 +108,11 @@ def one_page_snippet(page, search):
     for item in vacancies['items']:
         if item['snippet']['requirement']:
             snippet.append(item['snippet']['requirement'])
+            ''''
+            Для участников в значениях (от ключа snippet),
+            если есть значения  item -> snippet -> requirement, то
+            сохраняем их в сисок snippet
+            '''
     return snippet
 
 
@@ -141,3 +192,17 @@ def contacts():
 
 if __name__ == '__main__':
     app.run()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
